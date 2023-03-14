@@ -40,7 +40,8 @@ config = {
             'enable': False,
             'token': ''
         }
-    }
+    },
+    'captcha_key': ''
 }
 config_raw = {}
 config_raw.update(config)
@@ -55,12 +56,12 @@ def copy_config():
     return config_raw
 
 
-def config_v7_update(data: dict):
+def config_v7_1_update(data: dict):
     global update_config_need
     update_config_need = True
-    data['version'] = 7
-    data['cloud_games'] = {"genshin": {'enable': False, 'token': ''}}
-    log.info("config已升级到: 7")
+    data['version'] = 7.1
+    data['captcha_key'] = ''
+    log.info("config已升级到: 7.1")
     return data
 
 
@@ -70,10 +71,10 @@ def load_config(p_path=None):
         p_path = config_Path
     with open(p_path, "r", encoding='utf-8') as f:
         data = yaml.load(f, Loader=yaml.FullLoader)
-    if data['version'] == 7:
+    if data['version'] == 7.1:
         config = data
     else:
-        config = config_v7_update(data)
+        config = config_v7_1_update(data)
         save_config()
     log.info("Config加载完毕")
     return config

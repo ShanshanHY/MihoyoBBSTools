@@ -94,6 +94,16 @@ var cookie=document.cookie;var ask=confirm('Cookie:'+cookie+'\n\nDo you want to 
 
 3. 替换配置文件中 `useragent` 的原始内容
 
+## Captcha 人机验证
+
+本项目为个人修改版本，使用[2Captcha](https://2captcha.com/)进行验证码识别
+
+**注意！由于使用了第三方 Captcha 识别服务，该功能将会收取一定的费用**
+
+**请仔细斟酌后决定是否使用该功能！不要本末倒置！**
+
+具体使用方法请查看[这里](/CAPTCHA.md)
+
 ## 使用 Docker 运行
 
 Docker 的运行脚本基于 Linux 平台编写，暂未在 Win 平台测试。

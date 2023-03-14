@@ -49,18 +49,22 @@ class Genshin:
     def check_in(self, account):
         header = {}
         header.update(self.headers)
-        max = 3
-        for i in range(max+1):
-            if i != 0:
-                log.info(f'触发验证码，即将进行第{i}次重试，最多3次')
+        max = [3, 3]
+        count = [0, 0]
+        while True:
             req = http.post(url=setting.genshin_Signurl, headers=header,
                             json={'act_id': setting.genshin_Act_id, 'region': account[2], 'uid': account[1]})
-            if req.status_code == 429:
+            if req.status_code == 429 and count[0] < max[0]:
+                count[0] += 1
+                log.warning(f'429 Too Many Requests ，第{count[0]}次等待，10秒后进入下一次请求，最多等待{max[0]}次')
                 time.sleep(10)  # 429同ip请求次数过多，尝试sleep10s进行解决
-                log.warning(f'429 Too Many Requests ，即将进入下一次请求')
                 continue
+            elif count[0] >= max[0]:
+                break
             data = req.json()
-            if data["retcode"] == 0 and data["data"]["success"] == 1 and i < max:
+            if data["retcode"] == 0 and data["data"]["success"] == 1 and count[1] < max[1]:
+                count[1] += 1
+                log.info(f'触发验证码，即将进行第{count[1]}次打码，最多打码{max[1]}次')
                 validate = captcha.game_captcha(data["data"]["gt"], data["data"]["challenge"])
                 if validate is not None:
                     header["x-rpc-challenge"] = data["data"]["challenge"]
