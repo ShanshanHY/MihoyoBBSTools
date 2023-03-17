@@ -43,26 +43,25 @@ def main():
         ret_code = 0
         if config.config["mihoyobbs"]["enable"]:
             bbs = mihoyobbs.Mihoyobbs()
+            for i in range(3):
+                if (not bbs.Task_do["bbs_Sign"] or i < 1) and config.config["mihoyobbs"]["checkin"]:
+                    bbs.signing()
+                if (not bbs.Task_do["bbs_Read_posts"] or i < 1) and config.config["mihoyobbs"]["read_posts"]:
+                    bbs.read_posts()
+                if (not bbs.Task_do["bbs_Like_posts"] or i < 1) and config.config["mihoyobbs"]["like_posts"]:
+                    bbs.like_posts()
+                if (not bbs.Task_do["bbs_Share"] or i < 1) and config.config["mihoyobbs"]["share_post"]:
+                    bbs.share_post()
+                bbs.get_tasks_list()
+                if bbs.Task_do["bbs_Read_posts"] and bbs.Task_do["bbs_Like_posts"] and bbs.Task_do["bbs_Share"]:
+                    break
+                bbs.refresh_list()
             if bbs.Task_do["bbs_Sign"] and bbs.Task_do["bbs_Read_posts"] and bbs.Task_do["bbs_Like_posts"] and \
                     bbs.Task_do["bbs_Share"]:
                 return_data += "\n" + f"今天已经全部完成了！\n" \
                                       f"一共获得{mihoyobbs.today_have_get_coins}个米游币\n目前有{mihoyobbs.have_coins}个米游币"
                 log.info(f"今天已经全部完成了！一共获得{mihoyobbs.today_have_get_coins}个米游币，目前有{mihoyobbs.have_coins}个米游币")
             else:
-                i = 0
-                while mihoyobbs.today_get_coins != 0 and i < 3:
-                    if i > 0:
-                        bbs.refresh_list()
-                    if config.config["mihoyobbs"]["checkin"]:
-                        bbs.signing()
-                    if config.config["mihoyobbs"]["read_posts"]:
-                        bbs.read_posts()
-                    if config.config["mihoyobbs"]["like_posts"]:
-                        bbs.like_posts()
-                    if config.config["mihoyobbs"]["share_post"]:
-                        bbs.share_post()
-                    bbs.get_tasks_list()
-                    i += 1
                 return_data += "\n" + f"今天已经获得{mihoyobbs.today_have_get_coins}个米游币\n" \
                                       f"还能获得{mihoyobbs.today_get_coins}个米游币\n目前有{mihoyobbs.have_coins}个米游币"
                 log.info(f"今天已经获得{mihoyobbs.today_have_get_coins}个米游币，"

@@ -2,6 +2,7 @@ import time
 import tools
 import config
 import random
+import captcha
 import setting
 from request import http
 from loghelper import log
@@ -46,6 +47,35 @@ class Honkai3rd:
             raise CookieError("BBS Cookie Errror")
         return data["data"]
 
+    def check_in(self, account):
+        header = {}
+        header.update(self.headers)
+        max = [3, 3]
+        count = [0, 0]
+        while True:
+            req = http.post(url=setting.honkai3rd_Sign_url, headers=header,
+                            json={'act_id': setting.honkai3rd_Act_id, 'region': account[2], 'uid': account[1]})
+            if req.status_code == 429 and count[0] < max[0]:
+                count[0] += 1
+                log.warning(f'429 Too Many Requests ，第{count[0]}次等待，10秒后进入下一次请求，最多等待{max[0]}次')
+                time.sleep(10)  # 429同ip请求次数过多，尝试sleep10s进行解决
+                continue
+            elif count[0] >= max[0]:
+                break
+            data = req.json()
+            if data["retcode"] == 0 and data["data"]["success"] == 1 and count[1] < max[1]:
+                count[1] += 1
+                log.info(f'触发验证码，即将进行第{count[1]}次打码，最多打码{max[1]}次')
+                validate = captcha.game_captcha(data["data"]["gt"], data["data"]["challenge"])
+                if validate is not None:
+                    header["x-rpc-challenge"] = data["data"]["challenge"]
+                    header["x-rpc-validate"] = validate
+                    header["x-rpc-seccode"] = f'{validate}|jordan'
+                time.sleep(random.randint(6, 15))
+            else:
+                break
+        return req
+
     # 签到
     def sign_account(self) -> str:
         return_data = "崩坏3: "
@@ -58,7 +88,7 @@ class Honkai3rd:
                 is_data = self.is_sign(region=i[2], uid=i[1])
                 # if not is_data["is_sub"]:  # 这个字段不知道干啥的，就先塞这里了
                 if False: # 算了先改成false
-                    log.warning(f"旅行者{i[0]}是第一次绑定米游社，请先手动签到一次")
+                    log.warning(f"舰长{i[0]}是第一次绑定米游社，请先手动签到一次")
                 else:
                     sign_days = is_data["total_sign_day"] - 1
                     ok = True
@@ -67,22 +97,34 @@ class Honkai3rd:
                         sign_days += 1
                     else:
                         time.sleep(random.randint(2, 8))
-                        req = http.post(url=setting.honkai3rd_Sign_url, headers=self.headers,
-                                        json={'act_id': setting.honkai3rd_Act_id, 'region': i[2], 'uid': i[1]})
-                        data = req.json()
-                        if data["retcode"] == 0:
-                            log.info(f"舰长:{i[0]}签到成功~\r\n今天获得的奖励是"
-                                     f"{tools.get_item(self.checkin_rewards[0 if sign_days == 0 else sign_days + 1])}")
-                            sign_days += 2
-                        elif data["retcode"] == -5003:
-                            log.info(f"舰长:{i[0]}今天已经签到过了~\r\n今天获得的奖励是{tools.get_item(self.checkin_rewards[sign_days])}")
+                        req = self.check_in(i)
+                        if req.status_code != 429:
+                            data = req.json()
+                            print(data)
+                            if data["retcode"] == 0 and data["data"]["success"] == 0:
+                                log.info(f"舰长:{i[0]}签到成功~\r\n今天获得的奖励是"
+                                        f"{tools.get_item(self.checkin_rewards[0 if sign_days == 0 else sign_days + 1])}")
+                                sign_days += 2
+                            elif data["retcode"] == -5003:
+                                log.info(f"舰长:{i[0]}今天已经签到过了~\r\n今天获得的奖励是{tools.get_item(self.checkin_rewards[sign_days])}")
+                            else:
+                                s = "账号签到失败！"
+                                if data["data"] != "" and data.get("data").get("success", -1):
+                                    s += "原因: 验证码\njson信息:" + req.text
+                                log.warning(s)
+                                ok = False
                         else:
-                            log.warning("账号签到失败！")
                             ok = False
+                            data = {"success": -2}
                     if ok:
                         return_data += f"\n{i[0]}已连续签到{sign_days}天\n今天获得的奖励是{tools.get_item(self.checkin_rewards[sign_days - 1])}"
                     else:
                         return_data += f"\n{i[0]}，本次签到失败"
+                        if data.get("data") is not None:
+                            if data.get("data").get("success", -1) == 1:
+                                return_data += "，失败原因: 触发验证码"
+                            elif data.get("data").get("success", -2) == 1:
+                                return_data += "，失败原因: 请求次数过多"
         else:
             log.warning("账号没有绑定任何崩坏3账号！")
             return_data += "\n并没有绑定任何崩坏3账号"

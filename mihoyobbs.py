@@ -148,6 +148,7 @@ class Mihoyobbs:
                 check_pass = False
                 for i2 in range(2):
                     if check_pass:
+                        log.info("社区签到成功")
                         continue
                     header["DS"] = tools.get_ds2("", json.dumps({"gids": i["id"]}))
                     req = http.post(url=setting.bbs_sign_url, json={"gids": i["id"]}, headers=header)
@@ -163,11 +164,11 @@ class Mihoyobbs:
                         if challenge is not None:
                             challenge = None
                             header.pop("x-rpc-challenge")
-                        time.sleep(random.randint(2, 8))
                     else:
                         log.error("签到失败，你的cookie可能已过期，请重新设置cookie。")
                         config.clear_cookies()
                         raise CookieError('Cookie expires')
+                    time.sleep(random.randint(2, 8))
 
     # 看帖子
     def read_posts(self):

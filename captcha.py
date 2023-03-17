@@ -35,14 +35,14 @@ def solve_captcha(gt: str, challenge: str, pageurl: str, captcha_key: str,
     request = http.post(url=captcha_api)
     if str(request.status_code) != "200":
         return f"ERROR_{str(request.status_code)}_{request.text}"
-    request_result = json.loads(request.text)
+    request_result = request.json()
     if str(request_result["status"]) == "1":
         solve_captcha_url = f"http://2captcha.com/res.php?key={captcha_key}&action=get&id={request_result['request']}&json=1"
         # 识别结果查询
         while True:
             sleep(5)
             captcha = http.post(url=solve_captcha_url)
-            captcha_result = json.loads(captcha.text)
+            captcha_result = captcha.json()
             if str(captcha_result["status"]) == "1":
                 result = captcha_result["request"]["geetest_validate"]
                 break
