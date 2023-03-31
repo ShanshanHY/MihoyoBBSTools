@@ -9,6 +9,7 @@ import genshin
 import setting
 import mihoyobbs
 import honkai3rd
+import birthdaystar
 import tearsofthemis
 import cloud_genshin
 from error import *
@@ -95,6 +96,7 @@ def main():
                 ret_code = 3
             return_data += "\n\n" + genshin_message
             time.sleep(random.randint(2, 8))
+        # 云原神签到
         if config.config['cloud_games']['genshin']["enable"]:
             log.info("正在进行云原神签到")
             if config.config['cloud_games']['genshin']['token'] == "":
@@ -103,6 +105,12 @@ def main():
                 cloud_ys = cloud_genshin.CloudGenshin()
                 data = cloud_ys.sign_account()
                 return_data += "\n\n" + data
+        # 留影叙佳期
+        if config.config["birthdaystar"]["enable"]:
+            log.info("正在进行留影叙佳期")
+            birthdaystar_help = birthdaystar.Birthdaystar()
+            return_data += "\n\n" + birthdaystar_help.celebrate()
+        
         return ret_code, return_data
     elif config.config["account"]["cookie"] == "CookieError":
         raise CookieError('Cookie expires')

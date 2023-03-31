@@ -43,3 +43,13 @@ cloud_games: #云游戏专区
   genshin: #云原神
     enable: true #开启签到
     token: "" #这里填入抓包获得的token
+goods: #米游社物品兑换(暂时无用)
+  enable: false
+  genshin: #原神专区
+    primogem_150: true #120原石
+    primogem_60: true #60原石
+    wit: true #大英雄的经验书
+    mora: true #摩拉
+birthdaystar: #留影叙佳期
+  enable: true
+captcha_key: "" #验证码识别
