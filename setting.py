@@ -127,3 +127,11 @@ genshin_Signurl = web_api + "/event/bbs_sign_reward/sign"
 # 云原神相关api
 cloud_genshin_Api = "https://api-cloudgame.mihoyo.com"
 cloud_genshin_sgin = cloud_genshin_Api + "/hk4e_cg_cn/wallet/wallet/get"
+
+# 留影叙佳期相关api
+e_hk4e_token = web_api + "/common/badge/v1/login/account"
+birthdaystar_Activity_id = "20220301153521"
+birthdaystar_api = "https://hk4e-api.mihoyo.com/event/birthdaystar/account"
+birthdaystar_parameter = "?badge_uid={}&badge_region={}&game_biz=hk4e_cn&activity_id=" + birthdaystar_Activity_id
+birthdaystar_query = birthdaystar_api + "/index" + birthdaystar_parameter
+birthdaystar_celebrate = birthdaystar_api + "/post_my_draw" + birthdaystar_parameter

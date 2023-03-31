@@ -41,6 +41,18 @@ config = {
             'token': ''
         }
     },
+    'goods':{
+        'enable': False,
+        'genshin':{
+            'primogem_150': True,
+            'primogem_60': True,
+            'wit': True,
+            'mora': True
+            }
+    },
+    'birthdaystar': {
+        'enable': True
+    },
     'captcha_key': ''
 }
 config_raw = {}
@@ -56,12 +68,22 @@ def copy_config():
     return config_raw
 
 
-def config_v7_1_update(data: dict):
+def config_v7_2_update(data: dict):
     global update_config_need
     update_config_need = True
-    data['version'] = 7.1
+    data['version'] = 7.2
+    data['goods'] = {
+        'enable': False,
+        'genshin':{
+            'primogem_150': True,
+            'primogem_60': True,
+            'wit': True,
+            'mora': True
+            }
+    }
+    data['birthdaystar'] = {'enable': True}
     data['captcha_key'] = ''
-    log.info("config已升级到: 7.1")
+    log.info("config已升级到: 7.2")
     return data
 
 
@@ -71,10 +93,10 @@ def load_config(p_path=None):
         p_path = config_Path
     with open(p_path, "r", encoding='utf-8') as f:
         data = yaml.load(f, Loader=yaml.FullLoader)
-    if data['version'] == 7.1:
+    if data['version'] == 7.2:
         config = data
     else:
-        config = config_v7_1_update(data)
+        config = config_v7_2_update(data)
         save_config()
     log.info("Config加载完毕")
     return config
