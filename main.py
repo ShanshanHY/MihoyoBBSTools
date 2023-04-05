@@ -99,9 +99,16 @@ def main():
         # 云原神签到
         if config.config['cloud_games']['genshin']["enable"]:
             log.info("正在进行云原神签到")
+            no_token = False
             if config.config['cloud_games']['genshin']['token'] == "":
-                log.info("token为空,跳过任务")
-            else:
+                log.info("token为空,尝试从米游社获取token")
+                cglogin = login.cloud_genshin()
+                if not cglogin:
+                    no_token = True
+                    log.info("token获取失败，跳过任务")
+                else:
+                    log.info("成功获取token，正在进行签到")
+            if not no_token:
                 cloud_ys = cloud_genshin.CloudGenshin()
                 data = cloud_ys.sign_account()
                 return_data += "\n\n" + data

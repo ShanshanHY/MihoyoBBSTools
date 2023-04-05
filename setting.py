@@ -10,6 +10,8 @@ mihoyobbs_Client_type = "2"  # 1为ios 2为安卓
 mihoyobbs_Client_type_web = "5"  # 4为pc web 5为mobile web
 # 云原神版本
 cloudgenshin_Version = "3.0.0"
+# 云原神签名
+cloudgenshin_sign = "d0d3a7342df2026a70f650b907800111"
 
 # 米游社的分区列表
 mihoyobbs_List = [{
@@ -129,6 +131,9 @@ cloud_genshin_Api = "https://api-cloudgame.mihoyo.com"
 cloud_genshin_sgin = cloud_genshin_Api + "/hk4e_cg_cn/wallet/wallet/get"
 cloud_genshin_ack = cloud_genshin_Api + "/hk4e_cg_cn/gamer/api/ackNotification"
 cloud_genshin_list = cloud_genshin_Api + "/hk4e_cg_cn/gamer/api/listNotifications?status=NotificationStatusUnread&type=NotificationTypePopup&is_sort=true"
+cloud_login_api = "https://hk4e-sdk.mihoyo.com/hk4e_cn"
+cloud_get_ct = cloud_login_api + "/combo/granter/login/v2/login"
+cloud_get_gametoken = web_api + "/auth/api/getGameToken?"
 
 # 留影叙佳期相关api
 e_hk4e_token = web_api + "/common/badge/v1/login/account"
